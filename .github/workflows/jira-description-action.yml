@@ -18,7 +18,7 @@ jobs:
     needs: enforce-jira-issue-key-pr-title
     runs-on: ubuntu-latest
     steps:
-        - uses: cakeinpanic/jira-description-action@v0.3.2
+        - uses: cakeinpanic/jira-description-action@v0.3.3
           name: Link Jira Project Key in Pull Request Description
           with:
             github-token: ${{ secrets.GITHUB_TOKEN }}

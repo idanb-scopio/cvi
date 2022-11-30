@@ -1,0 +1,90 @@
+# model type
+model_type: cells_classifier
+
+# this model differentiates between 5 different classes of white blood cells
+# model name
+model_name: "wbc_5_class"
+
+
+# mapping of dataset labels to labels that are present in this model.
+# note: names are case insensitive
+label_remap:
+  band: 'neu'
+  me: 'neu'
+  myle: 'neu'
+  promyelocyte: 'neu'
+  blast: 'mon'
+  plasma: 'lym'
+  lgl: 'lym'
+  al: 'lym'
+  abl: 'lym'
+  rfl: 'lym'
+  nrbc: 'lym'
+  left_shift: 'neu'
+  'segmented neutrophil': 'neu'
+  'band neutrophil': 'neu'
+  'metamyelocyte': 'neu'
+  'myelocyte': 'neu'
+  'lymphocyte': 'lym'
+  'plasma cell': 'lym'
+  'large granular lymphocyte': 'lym'
+  'atypical lymphocyte': 'lym'
+  'aberrant lymphocyte': 'lym'
+  'normoblast': 'lym'
+  'monocyte': 'mon'
+  'eosinophil': 'eos'
+  'basophil': 'bas'
+
+# class mapping: str -> int for classification model
+# note: names are case insensitive
+label_mapping:
+  neu: 0
+  lym: 1
+  mon: 2
+  bas: 3
+  eos: 4
+
+# the size of in input image the neural network takes: W, H, ch
+# note: only width == height is supported.
+input_image_size: [96, 96, 3]
+
+# Loss configuration
+loss:
+  # feature_loss: null
+  feature_loss: 'center_loss'
+  # loss_type: 'categorical_cross_entropy'
+  loss_type: 'weighted_categorical_cross_entropy'
+  weighted_categorical_cross_entropy:
+    use_per_class_weights: false
+    num_classes: 5
+    class_weights: [1., 1., 1., 1., 1.]
+    class_weights_matrix: [1.8, 1.5, 1.5, 8.0, 5.0,
+                           1.7, 1.8, 4.5, 1.7, 1.7,
+                           1.9, 6.7, 2.0, 1.9, 1.9,
+                           5.0, 2.0, 1.8, 1.8, 2.0,
+                           3.5, 1.5, 1.5, 3.0, 1.8]
+  center_loss:
+    num_classes: 5
+    update_factor: 0.01
+    center_loss_weights_list: [1., 1., 1., 1., 1.]
+    loss_weight: 0.5
+
+learn_rate:
+  # type: null
+  type: 'piecewise_const'
+  piecewise_const:
+    base_learn_rate: 1e-4
+    epochs_step_size: 10
+    epochs_steps_factors: [1.2, 0.25, 0.08, 1.0, 0.15, 0.05, 0.7, 0.1, 0.03]
+
+training_image_augmentations:
+
+  # rotation is done using random multiples of the following angle.
+  rotation_angle_multiples: 45
+
+  # the maximum angle to rotate the image. must be larger than rotation_angles_multiples
+  max_rotation_angle: 360
+
+  # maximum shift in pixels, same for both axis, in source image.
+  # destination image scales this number down according to "scale_down_factor"
+  max_shift: 10

@@ -1,0 +1,84 @@
+# model type
+model_type: cells_classifier
+
+# model name
+model_name: "blast_mon_lym"
+
+# mapping of dataset labels to labels that are present in this model.
+# note: names are case insensitive
+label_remap:
+  'MON': 'mon'
+  'BLAST': 'blast'
+  'LYM': 'lym'
+  'AL': 'lym'
+  'ABL': 'lym'
+  'LGL': 'lym'
+  'PLASMA': 'lym'
+  'RFL': 'lym'
+  'ME': 'neg'
+  'MYLE': 'neg'
+  'Promyelocyte': 'neg'
+  'monocyte': 'mon'
+  'blast': 'blast'
+  'lymphocyte': 'lym'
+  'large granular lymphocyte': 'lym'
+  'atypical lymphocyte': 'lym'
+  'aberrant lymphocyte': 'lym'
+  'plasma cell': 'lym'
+  'nrbc': 'lym'
+  'metamyelocyte': 'neg'
+  'myelocyte': 'neg'
+  'promyelocyte': 'neg'
+
+# class mapping: str -> int for classification model
+# note: names are case insensitive
+label_mapping:
+  mon: 0
+  blast: 1
+  lym: 2
+  neg: 3
+build_interpolation_type: "cubic"
+
+# the size of in input image the neural network takes: W, H, ch
+# note: only width == height is supported.
+input_image_size: [96, 96, 3]
+
+# Loss configuration
+loss:
+  # feature_loss: null
+  feature_loss: 'center_loss'
+  # loss_type: 'categorical_cross_entropy'
+  loss_type: 'weighted_categorical_cross_entropy'
+  weighted_categorical_cross_entropy:
+    use_per_class_weights: false
+    num_classes: 4
+    class_weights: [1., 1., 1., 1.]
+    class_weights_matrix: [2.0, 5.5, 4.5, 4.0,
+                           5.5, 2.0, 5.5, 4.0,
+                           4.5, 5.8, 2.0, 4.0,
+                           4.0, 4.0, 4.0, 2.0]
+  center_loss:
+    num_classes: 4
+    update_factor: 0.01
+    center_loss_weights_list: [1., 1., 1., 1.]
+    loss_weight: 0.5
+
+learn_rate:
+  # type: null
+  type: 'piecewise_const'
+  piecewise_const:
+    base_learn_rate: 1e-4
+    epochs_step_size: 10
+    epochs_steps_factors: [1.2, 0.25, 0.08, 1.0, 0.15, 0.05, 0.7, 0.1, 0.03]
+
+training_image_augmentations:
+
+  # rotation is done using random multiples of the following angle.
+  rotation_angle_multiples: 45
+
+  # the maximum angle to rotate the image. must be larger than rotation_angles_multiples
+  max_rotation_angle: 360
+
+  # maximum shift in pixels, same for both axis, in source image.
+  # destination image scales this number down according to "scale_down_factor"
+  max_shift: 10

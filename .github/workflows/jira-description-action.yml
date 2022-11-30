@@ -1,0 +1,29 @@
+name: Enforce Pull Request
+on:
+  pull_request:
+      types:
+      - opened
+      - reopened
+      - edited
+      - synchronize
+jobs:
+  enforce-jira-issue-key-pr-title:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: ryanvade/enforce-pr-title-style-action@v1
+        name: Enforce Jira Issue Key in Pull Request Title #jira-description-action
+        # with:
+        #   projectKey: 'DEVOPS' #optional
+  add-jira-key-pr-description:
+    needs: enforce-jira-issue-key-pr-title
+    runs-on: ubuntu-latest
+    steps:
+        - uses: cakeinpanic/jira-description-action@v0.3.2
+          name: Link Jira Project Key in Pull Request Description
+          with:
+            github-token: ${{ secrets.GITHUB_TOKEN }}
+            jira-token: ${{ secrets.JIRA_TOKEN }}
+            jira-base-url: https://scopiolabs.atlassian.net
+            #skip-branches: '^(production-release|main|master|release\/v\d+)$' #optional 
+            #custom-issue-number-regexp: '^\d+' #optional
+            #jira-project-key: 'PRJ' #optional

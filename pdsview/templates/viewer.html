@@ -1,0 +1,135 @@
+<html>
+  <head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/openseadragon/2.4.2/openseadragon.min.js"></script>
+    <style type="text/css">
+      .openseadragon1 {
+        height: 90%;
+      }
+
+      body {
+        text-align: center;
+      }
+
+      footer {
+        position: absolute;
+        right: 0px;
+        bottom: 0px;
+        left: 0px;
+        padding: 0.3rem;
+        text-align: left;
+      }
+
+      #viewerContainer {
+        position: absolute;
+        top: 60px;
+        bottom: 10px;
+        left: 0px;
+        right: 0px;
+        overflow: auto;
+        width: 100%;
+        height: auto;
+        text-align: center;
+        background-color: #e4e4e4;
+      }
+
+      .footer-text {
+        font-size: 100%;
+        font-family: sans-serif;
+      }
+
+      .footer-img {
+        height: auto;
+        width: auto;
+        max-width: 190px;
+        max-height: 48px;
+      }
+
+      html {
+        font-size: 100%;
+        -webkit-text-size-adjust: 100%;
+        -ms-text-size-adjust: 100%;
+      }
+
+      html,
+      button,
+      input,
+      select,
+      textarea {
+        font-family: sans-serif;
+      }
+
+      img {
+        border: 0;
+        -ms-interpolation-mode: bicubic;
+        vertical-align: middle;
+      }
+
+      * {
+        font-family: 'Open Sans', sans-serif;
+      }
+    </style>
+  </head>
+
+  <body>
+
+    <header>
+      <h2> Scan Viewer: {{ scan_id }} {{ pyramid_res }} </h2>
+    </header>
+    <div id="viewerContainer">
+      <div id="contentDiv" class="openseadragon1"></div>
+    </div>
+
+    <script>
+        var viewer = OpenSeadragon({
+          id: "contentDiv",
+          prefixUrl: "//openseadragon.github.io/openseadragon/images/",
+          tileSources: "/pyramid/pyramid.dzi",
+          maxZoomPixelRatio: 1,
+          showNavigator: true,
+          sequenceMode: true,
+        });
+
+        viewer.addOnceHandler("open", () => {
+          fetch("/labels").then(data => data.json()).then( data => {
+            data["ROIs"].forEach(rect => {
+              console.log(rect)
+                
+              const viewportRect = viewer.viewport.imageToViewportRectangle(rect[0], rect[1], rect[2], rect[3])
+              console.log(viewportRect)
+              const divElement = document.createElement('div')
+              divElement.innerHTML = rect[4]
+              divElement.style.border = "2px solid red"
+              console.log(divElement)
+              viewer.addOverlay(divElement, viewportRect)
+            })
+
+            data["labels"].forEach(rect => {
+              const viewportRect = viewer.viewport.imageToViewportRectangle(rect[0], rect[1], rect[2], rect[3])
+              const divElement = document.createElement('div')
+              divElement.innerHTML = rect[4]
+              divElement.style.border = "2px solid " + (rect[5] || 'blue')
+              viewer.addOverlay(divElement, viewportRect)
+            })
+
+          })
+
+          const { x: width, y: height } = viewer.world.getItemAt(0).getContentSize()
+          const viewportRect = viewer.viewport.imageToViewportRectangle(0, 0, width, height)
+          const divElement = document.createElement('div')
+          divElement.style.border = "2px solid black"
+          viewer.addOverlay(divElement, viewportRect)
+        })
+
+        viewer.addHandler('canvas-click', function(event) {
+          var viewportPoint = viewer.viewport.pointFromPixel(event.position);
+          var imagePoint = viewer.viewport.viewportToImageCoordinates(viewportPoint.x, viewportPoint.y);
+          console.log(imagePoint.x, imagePoint.y);
+        });
+
+        // viewer.viewport.panTo(viewer.viewport.imageToViewportCoordinates(new OpenSeadragon.Point(40000, 92000)), true)
+
+    </script>
+  </body>
+
+</html>
+

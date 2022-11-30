@@ -1,0 +1,103 @@
+input_image_size: [96, 96, 3]
+model_res: 0.0002016
+model_type: cells_cascade
+model_name: classifiers
+
+# cascade models, in the order of execution
+models:
+- smudge
+- wbc_5_class
+
+cascade_params:
+
+  smudge:
+
+    # classes appear here for convenience. they must match the model's
+    # label_mapping by the order of the target class.
+    # example:
+    # {wbc: 0, broken: 1, neg: 2} must match here the list: [wbc, broken, neg]
+    classes:
+      - wbc
+      - broken
+      - neg
+
+    # a list of labels this model accepts as input. Empty list = "all".
+    # if there's no match for a given sample, then this model does is unable
+    # to update its classification label.
+    model_input_labels: ["cell"]
+
+    # if probability_thresholds are specified, a given sample probability must
+    # exceed this value in order for this model to be able to update its
+    # classification label.
+    #
+    # format: percents - a number between 0-100.
+    # note: a number above 100 means that no matter the inference results, the
+    # label with that threshold can't be used to update the classification
+    # label for this stage.
+    probability_thresholds:
+      neg: 40
+
+
+  wbc_5_class:
+    classes:
+      - neu
+      - lym
+      - mon
+      - bas
+      - eos
+
+    # this model accepts only samples that were classified as white blood cells
+    # by the previous model (smudge)
+    model_input_labels: ["wbc"]
+
+    # this model needs to have a high confidence when predicting basophils.
+    probability_thresholds:
+      neu: 20
+      lym: 20
+      mon: 20
+      bas: 85
+      eos: 32
+
+label_mapping:
+  neg: 0
+  broken: 1
+  wbc: 2
+  neu: 3
+  lym: 4
+  mon: 5
+  bas: 6
+  eos: 7
+
+label_remap:
+  band: 'neu'
+  me: 'neu'
+  myle: 'neu'
+  promyelocyte: 'neu'
+  blast: 'mon'
+  plasma: 'lym'
+  lgl: 'lym'
+  al: 'lym'
+  abl: 'lym'
+  rfl: 'lym'
+  nrbc: 'lym'
+  left_shift: 'neu'
+  'band neutrophil': 'neu'
+  'myelocyte': 'neu'
+  'plasma cell': 'lym'
+  'large granular lymphocyte': 'lym'
+  'atypical lymphocyte': 'lym'
+  'monocyte': 'mon'
+  'metamyelocyte': 'neu'
+  'lymphocyte': 'lym'
+  'aberrant lymphocyte': 'lym'
+  'eosinophil': 'eos'
+  'segmented neutrophil': 'neu'
+  'basophil': 'bas'
+  'smudge cell': broken
+  'unclassified wbc': wbc
+  'dirt': neg
+  'clm': wbc
+  'consultation': wbc
+  'unknown': wbc
+  'gcd': broken
+  'normoblast': lym

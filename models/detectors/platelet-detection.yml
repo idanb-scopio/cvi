@@ -1,0 +1,102 @@
+# model type
+model_type: cells_detector
+
+# model name
+model_name: "plt_detection"
+
+# detection model network type
+det_net_type: "det_net_2"
+
+# mapping of dataset labels to labels that are present in this model.
+# note: names are case insensitive
+label_remap:
+  NEU: 'not_plt'
+  MON: 'not_plt'
+  BAS: 'not_plt'
+  EOS: 'not_plt'
+  blast: 'not_plt'
+  BAND: 'not_plt'
+  ME: 'not_plt'
+  MYLE: 'not_plt'
+  promyelocyte: 'not_plt'
+  LYM: 'not_plt'
+  LGL: 'not_plt'
+  AL: 'not_plt'
+  ABL: 'not_plt'
+  PLASMA: 'not_plt'
+  RFL: 'not_plt'
+  NRBC: 'not_plt'
+  GCD: 'not_plt'
+  dirt: 'not_plt'
+  consultation: 'not_plt'
+  WBC: 'not_plt'
+  'smudge cell': 'not_plt'
+  'segmented neutrophil': 'not_plt'
+  'eosinophil': 'not_plt'
+  'basophil': 'not_plt'
+  'band neutrophil': 'not_plt'
+  'myelocyte': 'not_plt'
+  'plasma cell': 'not_plt'
+  'large granular lymphocyte': 'not_plt'
+  'atypical lymphocyte': 'not_plt'
+  'unclassified wbc': 'not_plt'
+  'monocyte': 'not_plt'
+  'metamyelocyte': 'not_plt'
+  'lymphocyte': 'not_plt'
+  'aberrant lymphocyte': 'not_plt'
+
+# class mapping: str -> int for classification model
+# for regression detection, it is binary: examples that are 'cell' get a target image with a gaussian where
+# the cell is located, no_cell examples get a blank image.
+label_mapping:
+  not_plt: 0
+  plt: 1
+
+# temporary, until gaussian calculations are implemented. this size is the N part of
+# the gaussian-NxN-240.png files
+gaussian_size: 8
+
+# the size of in input image the neural network takes: W, H, ch
+# being a fully convolutional network, predict input can be different from the
+# specified training input image size.
+# note: only width == height is supported.
+input_image_size: [128, 128, 3]
+
+# level scale divider is the division factor of the input image relative to the full resolution.
+# values should be a power of 2. if omitted, level_scale_div is 1 (i.e. input image is taken from
+# full resolution without resizing).
+level_scale_div: 1
+
+# regression target image size divider relative to input image size.
+# a factor of 2 means the label image is twice smaller (in each axis) than input_image_size
+scale_down_factor: 1
+
+# results are converted from center points to rectangles when saved to JSON.
+# this parameter controls the size of the rectangle. Usually this is set to
+# the classifier NN input size, if such a step follows this detection step.
+detection_bounding_box_size: [30, 30]
+
+# label string saved in the output JSON of a prediction. used for viewing with pdsview.
+# for platelet detection, the string is empty since the bbox is small and text obscures
+# the actual platelets.
+detection_label_str: ""
+
+learn_rate:
+  # type: null
+  type: 'piecewise_const'
+  piecewise_const:
+    base_learn_rate: 1e-4
+    epochs_step_size: 16
+    epochs_steps_factors: [1.2, 0.25, 0.08, 1.0, 0.15, 0.05, 0.7, 0.1, 0.03]
+
+training_image_augmentations:
+
+  # rotation is done using random multiples of the following angle.
+  rotation_angle_multiples: 45
+
+  # the maximum angle to rotate the image. must be larger than rotation_angles_multiples
+  max_rotation_angle: 360
+
+  # maximum shift in pixels, same for both axis, in source image.
+  # destination image scales this number down according to "scale_down_factor"
+  max_shift: 10

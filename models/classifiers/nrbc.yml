@@ -1,0 +1,43 @@
+# model type
+model_type: cells_classifier
+
+# this model differentiates between nrbcs and lymphocytes
+# model name
+model_name: "nrbc"
+
+# mapping of dataset labels to labels that are present in this model.
+# note: names are case insensitive
+label_remap:
+  nrbc: 'rfl'
+  al: 'neg'
+  abl: 'neg'
+  lgl: 'neg'
+  plasma: 'neg'
+  plasma cell: 'neg'
+  'large granular lymphocyte': 'neg'
+  'atypical lymphocyte': 'neg'
+  'lymphocyte': 'neg'
+  'aberrant lymphocyte': 'neg'
+
+# class mapping: str -> int for classification model
+# note: names are case insensitive
+label_mapping:
+  rfl: 0
+  neg: 1
+
+# the size of in input image the neural network takes: W, H, ch
+# note: only width == height is supported.
+input_image_size: [96, 96, 3]
+
+
+training_image_augmentations:
+
+  # rotation is done using random multiples of the following angle.
+  rotation_angle_multiples: 45
+
+  # the maximum angle to rotate the image. must be larger than rotation_angles_multiples
+  max_rotation_angle: 360
+
+  # maximum shift in pixels, same for both axis, in source image.
+  # destination image scales this number down according to "scale_down_factor"
+  max_shift: 10

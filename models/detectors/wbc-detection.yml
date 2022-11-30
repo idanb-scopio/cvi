@@ -1,0 +1,102 @@
+# model type
+model_type: cells_detector
+
+# model name
+model_name: "wbc_detection"
+
+# mapping of dataset labels to labels that are present in this model.
+# note: names are case insensitive
+label_remap:
+  NEU: 'cell'
+  MON: 'cell'
+  BAS: 'cell'
+  EOS: 'cell'
+  blast: 'cell'
+  BAND: 'cell'
+  ME: 'cell'
+  MYLE: 'cell'
+  promyelocyte: 'cell'
+  LYM: 'cell'
+  LGL: 'cell'
+  AL: 'cell'
+  ABL: 'cell'
+  PLASMA: 'cell'
+  RFL: 'cell'
+  NRBC: 'cell'
+  GCD: 'cell'
+  dirt: 'no_cell'
+  consultation: 'cell'
+  WBC: 'cell'
+  normoblast: 'cell'
+  broken: 'cell'
+  neg: 'no_cell'
+  NEG: 'no_cell'
+  unknown: 'cell'
+  'smudge cell': 'cell'
+  'segmented neutrophil': 'cell'
+  'eosinophil': 'cell'
+  'basophil': 'cell'
+  'band neutrophil': 'cell'
+  'myelocyte': 'cell'
+  'plasma cell': 'cell'
+  'large granular lymphocyte': 'cell'
+  'atypical lymphocyte': 'cell'
+  'unclassified wbc': 'cell'
+  'monocyte': 'cell'
+  'metamyelocyte': 'cell'
+  'lymphocyte': 'cell'
+  'aberrant lymphocyte': 'cell'
+
+# class mapping: str -> int for classification model
+# for regression detection, it is binary: examples that are 'cell' get a target image with a gaussian where
+# the cell is located, no_cell examples get a blank image.
+label_mapping:
+  no_cell: 0
+  cell: 1
+
+# temporary, until gaussian calculations are implemented. this size is the N part of
+# the gaussian-NxN-240.png files
+gaussian_size: 16
+
+# the size of in input image the neural network takes: W, H, ch
+# being a fully convolutional network, predict input can be different from the
+# specified training input image size.
+# note: only width == height is supported.
+input_image_size: [96, 96, 3]
+
+# level scale divider is the division factor of the input image relative to the full resolution.
+# values should be a power of 2. if omitted, level_scale_div is 1 (i.e. input image is taken from
+# full resolution without resizing).
+level_scale_div: 4
+
+# regression target image size divider relative to input image size.
+# a factor of 2 means the label image is twice smaller (in each axis) than input_image_size
+scale_down_factor: 2
+
+# results are converted from center points to rectangles when saved to JSON.
+# this parameter controls the size of the rectangle. Usually this is set to
+# the classifier NN input size, if such a step follows this detection step.
+detection_bounding_box_size: [96, 96]
+
+
+training_image_augmentations:
+
+  # rotation is done using random multiples of the following angle.
+  rotation_angle_multiples: 45
+
+  # the maximum angle to rotate the image. must be larger than rotation_angles_multiples
+  max_rotation_angle: 360
+
+  # maximum shift in pixels, same for both axis, in source image.
+  # destination image scales this number down according to "scale_down_factor"
+  max_shift: 10
+
+
+learn_rate:
+  # type: null
+  type: 'piecewise_const'
+  piecewise_const:
+    base_learn_rate: 1e-4
+    epochs_step_size: 10
+    epochs_steps_factors: [1.2, 0.25, 0.08, 1.0, 0.15, 0.05, 0.7, 0.1, 0.03]
+

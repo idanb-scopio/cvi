@@ -1,0 +1,17 @@
+
+shortform_map:
+  'segmented neutrophil': neu
+  'lymphocyte': lym
+  'Smudge Cell': gcd
+  'monocyte': mon
+  'band neutrophil': band
+  'eosinophil': eos
+  'large granular lymphocyte': lgl
+  'basophil': bas
+  'metamyelocyte': me
+  'myelocyte': myle
+  'nrbc': rfl
+  'atypical lymphocyte': al
+  'aberrant lymphocyte': abl
+  'Unclassified WBC': wbc
+  'plasma cell': plasma

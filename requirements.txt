@@ -1,0 +1,17 @@
+PyYAML
+tensorflow-gpu==2.7.2
+Pillow
+opencv-python
+pytest
+matplotlib
+pydot
+scipy
+scikit-image
+scikit-learn
+tensorflow-addons
+pyzmq
+flask
+psutil
+tabulate
+pandas
+openpyxl

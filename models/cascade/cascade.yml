@@ -1,0 +1,199 @@
+input_image_size: [96, 96, 3]
+model_res: 0.0002016
+model_type: cells_cascade
+model_name: classifiers
+
+# cascade models, in the order of execution
+models:
+- smudge
+- wbc_5_class
+- neu_leftshift
+- nrbc
+- blast_mon_lym
+- lgl_al  
+- plasma
+
+cascade_params:
+
+  smudge:
+
+    # classes appear here for convenience. they must match the model's
+    # label_mapping by the order of the target class.
+    # example:
+    # {wbc: 0, broken: 1, neg: 2} must match here the list: [wbc, broken, neg]
+    classes:
+      - wbc
+      - broken
+      - neg
+
+    # a list of labels this model accepts as input. Empty list = "all".
+    # if there's no match for a given sample, then this model does is unable
+    # to update its classification label.
+    model_input_labels: ["cell"]
+
+    # if probability_thresholds are specified, a given sample probability must
+    # exceed this value in order for this model to be able to update its
+    # classification label.
+    #
+    # format: percents - a number between 0-100.
+    # note: a number above 100 means that no matter the inference results, the
+    # label with that threshold can't be used to update the classification
+    # label for this stage.
+    probability_thresholds:
+      neg: 40
+
+
+  wbc_5_class:
+    classes:
+      - neu
+      - lym
+      - mon
+      - bas
+      - eos
+
+    # this model accepts only samples that were classified as white blood cells
+    # by the previous model (smudge)
+    model_input_labels: ["wbc"]
+
+    # this model needs to have a high confidence when predicting basophils.
+    probability_thresholds:
+      neu: 20
+      lym: 20
+      mon: 20
+      bas: 85
+      eos: 32
+
+
+  neu_leftshift:
+    classes:
+      - neu
+      - band
+      - me
+      - myle
+      - promyelocyte
+
+    model_input_labels: ["neu"]
+    probability_thresholds:
+      neu: 10
+      band: 10
+      me: 60
+      myle: 60
+      promyelocyte: 60
+
+
+  # this model decides if a lymphocyte is a rfl cell
+  # this is rare and therefore the threshold for positive is high, and the
+  # option to update this model as negative is cancelled (has no meaning here).
+  nrbc:
+    classes:
+      - rfl
+      - neg
+    model_input_labels: ["lym"]
+    probability_thresholds:
+      rfl: 95
+      neg: 110
+
+
+  # classify between mon / blast / lym among cells previously classified as
+  # monocytes. This model allows for "change in mind" to a lymphocyte if
+  # confidence is high enough
+  blast_mon_lym:
+    classes:
+      - mon
+      - blast
+      - lym
+      - neg
+    model_input_labels: ["mon"]
+
+    # when ignore_input_classes field appears, it does not update any sample
+    # if the classes in the list appear in its "classification history" during
+    # the cascade flow.
+    ignore_input_classes: ["rfl"]
+    probability_thresholds:
+      mon: 40
+      blast: 25
+      lym: 65
+      neg: 95
+
+    # output_label_map field applies a label mapping to the output label.
+    # if neg class was classify (post threshold), map the classification result to wbc
+    output_label_map:
+      neg: wbc
+
+
+  # this model classifies between different lymphocite types
+  lgl_al:
+    classes:
+      - lym
+      - lgl
+      - al
+      - abl
+      - neg
+    model_input_labels: ["lym"]
+
+    # don't update classification on these classes for a given sample
+    ignore_input_classes: ["rfl", "mon", "blast"]
+
+    # neg (wbc) is removed from class update option
+    probability_thresholds:
+      lym: 20
+      lgl: 75
+      al: 70
+      abl: 75
+      neg: 110
+
+
+  plasma:
+    classes:
+      - plasma
+      - neg
+
+    model_input_labels: ["lym"]
+    ignore_input_classes: ["rfl", "lgl", "al", "abl"]
+
+    probability_thresholds:
+      plasma: 85
+      neg: 110
+
+label_mapping:
+  neu: 0
+  lym: 1
+  mon: 2
+  bas: 3
+  eos: 4
+  band: 5
+  me: 6
+  myle: 7
+  promyelocyte: 8
+  blast: 9
+  plasma: 10
+  lgl: 11
+  al: 12
+  abl: 13
+  rfl: 14
+  wbc: 15
+  broken: 16
+  neg: 17
+
+label_remap:
+  'segmented neutrophil': neu
+  'lymphocyte': lym
+  'smudge cell': broken
+  'monocyte': mon
+  'band neutrophil': band
+  'eosinophil': eos
+  'large granular lymphocyte': lgl
+  'basophil': bas
+  'metamyelocyte': me
+  'myelocyte': myle
+  'nrbc': rfl
+  'atypical lymphocyte': al
+  'aberrant lymphocyte': abl
+  'unclassified wbc': wbc
+  'plasma cell': plasma
+  'dirt': neg
+  'clm': wbc
+  'consultation': wbc
+  'unknown': wbc
+  'gcd': broken
+  'normoblast': rfl

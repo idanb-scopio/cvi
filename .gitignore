@@ -1,0 +1,13 @@
+# ignore pycharm's stuff
+*.idea/*
+*/.idea/*
+
+# ignore vim swp files
+.*.swp
+
+# ignore python3's cache dir
+*/__pycache__/*
+
+# ignore python cache files
+*.pyc
+

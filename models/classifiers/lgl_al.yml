@@ -1,0 +1,53 @@
+# model type
+model_type: cells_classifier
+
+# model name
+model_name: "lgl_al"
+
+# mapping of dataset labels to labels that are present in this model.
+# note: names are case insensitive
+label_remap:
+  mon: 'neg'
+  blast: 'neg'
+  me: 'neg'
+  myle: 'neg'
+  promyelocyte: 'neg'
+  al: 'al'
+  abl: 'abl'
+  lgl: 'lgl'
+  plasma: 'lym'
+  rfl: 'lym'
+  myelocyte: 'neg'
+  'plasma cell': 'lym'
+  'large granular lymphocyte': 'lgl'
+  'atypical lymphocyte': 'al'
+  'monocyte': 'neg'
+  'lymphocyte': 'lym'
+  'aberrant lymphocyte': 'abl'
+
+
+# class mapping: str -> int for classification model
+# note: names are case insensitive
+label_mapping:
+  lym: 0
+  lgl: 1
+  al: 2
+  abl: 3
+  neg: 4
+
+# the size of in input image the neural network takes: W, H, ch
+# note: only width == height is supported.
+input_image_size: [96, 96, 3]
+
+
+training_image_augmentations:
+
+  # rotation is done using random multiples of the following angle.
+  rotation_angle_multiples: 45
+
+  # the maximum angle to rotate the image. must be larger than rotation_angles_multiples
+  max_rotation_angle: 360
+
+  # maximum shift in pixels, same for both axis, in source image.
+  # destination image scales this number down according to "scale_down_factor"
+  max_shift: 10

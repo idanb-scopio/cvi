@@ -1,0 +1,97 @@
+# model type
+model_type: cells_classifier
+
+# model name
+model_name: "smudge"
+
+# mapping of dataset labels to labels that are present in this model.
+# note: names are case insensitive
+label_remap:
+  neu: 'wbc'
+  mon: 'wbc'
+  bas: 'wbc'
+  eos: 'wbc'
+  blast: 'wbc'
+  band: 'wbc'
+  me: 'wbc'
+  myle: 'wbc'
+  promyelocyte: 'wbc'
+  lym: 'wbc'
+  lgl: 'wbc'
+  al: 'wbc'
+  abl: 'wbc'
+  plasma: 'wbc'
+  rfl: 'wbc'
+  nrbc: 'wbc'
+  normoblast: 'wbc'
+  gcd: 'broken'
+  dirt: 'neg'
+  consultation: 'wbc'
+  unknown: 'wbc'
+  'smudge cell': 'broken'
+  'segmented neutrophil': 'wbc'
+  'eosinophil': 'wbc'
+  'basophil': 'wbc'
+  'band neutrophil': 'wbc'
+  'myelocyte': 'wbc'
+  'plasma cell': 'wbc'
+  'large granular lymphocyte': 'wbc'
+  'atypical lymphocyte': 'wbc'
+  'unclassified wbc': 'wbc'
+  'monocyte': 'wbc'
+  'metamyelocyte': 'wbc'
+  'lymphocyte': 'wbc'
+  'aberrant lymphocyte': 'wbc'
+
+# class mapping: str -> int for classification model
+# note: names are case insensitive
+label_mapping:
+  wbc: 0
+  broken: 1
+  neg: 2
+
+# Build interpolation type for resize
+build_interpolation_type: "cubic"
+
+# the size of in input image the neural network takes: W, H, ch
+# note: only width == height is supported.
+input_image_size: [96, 96, 3]
+
+# Loss configuration
+loss:
+  feature_loss: null
+  # feature_loss: 'center_loss'
+  loss_type: 'categorical_cross_entropy'
+  # loss_type: 'weighted_categorical_cross_entropy'
+  weighted_categorical_cross_entropy:
+    use_per_class_weights: false
+    num_classes: 3
+    class_weights: [1., 1., 1.]
+    class_weights_matrix: [2.0, 4.0, 8.0,
+                           4.0, 2.0, 4.0,
+                           6.0, 4.0, 2.0]
+  center_loss:
+    num_classes: 3
+    update_factor: 0.01
+    center_loss_weights_list: [1., 1., 1.]
+    loss_weight: 0.5
+
+learn_rate:
+  type: null
+  # type: 'piecewise_const'
+  piecewise_const:
+    base_learn_rate: 1e-4
+    epochs_step_size: 10
+    epochs_steps_factors: [1.2, 0.25, 0.08, 1.0, 0.15, 0.05, 0.7, 0.1, 0.03]
+
+training_image_augmentations:
+
+  # rotation is done using random multiples of the following angle.
+  rotation_angle_multiples: 45
+
+  # the maximum angle to rotate the image. must be larger than rotation_angles_multiples
+  max_rotation_angle: 360
+
+  # maximum shift in pixels, same for both axis, in source image.
+  # destination image scales this number down according to "scale_down_factor"
+  max_shift: 10

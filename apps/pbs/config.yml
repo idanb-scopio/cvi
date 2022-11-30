@@ -1,0 +1,69 @@
+# This is a configuration file for PBS analysis flow.
+# models (cvi sub dirs under "model-dir" parameter)
+models:
+  - classifiers
+  - wbc_detection
+  - plt_detection
+
+# tunable prediction parameters for each of the models
+prediction_params:
+
+  # White Blood Cells detection tunable parameters
+  wbc_detection:
+    # this should be set to the classifiers neural network input size
+    'label_bbox_size': [96, 96]
+
+    # tile size in pixels when the input ROI is split into tiles. tile is a square.
+    # due to the neural network constraints, it should be a multiple of 32.
+    # if its set otherwise, a performance penalty is paid due to padding.
+    'tile_size': 1024
+
+    # overlap in pixels between adjacent tiles. overlap must be big enough to
+    # contain the detection objects plus spare area
+    'tile_overlap': 100
+
+    # string label of a detected cell
+    'label_str': 'cell'
+
+  # Cascading models classification for WBC tunable parameters
+  classifiers:
+    # prediction batch size. larger batches should provide better performance,
+    # but consume more GPU memory.
+    batch_size: 256
+
+  # Platelet detection tunable parameters
+  plt_detection:
+    # for debug purposes (pdsview)
+    'label_bbox_size': [30, 30]
+
+    # tile size in pixels when the input ROI is split into tiles. tile is a square.
+    # due to the neural network constraints, it should be a multiple of 32.
+    # if its set otherwise, a performance penalty is paid due to padding.
+    'tile_size': 1024
+
+    # overlap in pixels between adjacent tiles. overlap must be big enough to
+    # contain the detection objects plus spare area
+    'tile_overlap': 100
+
+    # for debug purposes (pdsview)
+    'label_str': 'plt'
+
+
+# worker settings
+# gpu_device: gpu device number: [0..NUM_GPUS - 1]. set to -1 for CPU based inference.
+# gpu_mem_limit: memory limit, in MB, for the specific worker. set to 0 for no imposed limit.
+
+# X100 profile: Single 3080 GPU with 10G GPU memory
+worker_params:
+  wbc_detection:
+    gpu_device: 0
+    gpu_mem_limit: 6000
+    server_endpoint: 'ipc:///tmp/cvi_socket_wbc_detection'
+  classifiers:
+    gpu_device: 1
+    gpu_mem_limit: 12000
+    server_endpoint: 'ipc:///tmp/cvi_socket_classifiers'
+  plt_detection:
+    gpu_device: 2
+    gpu_mem_limit: 6000
+    server_endpoint: 'ipc:///tmp/cvi_socket_plt_detection'
